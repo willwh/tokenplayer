@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using DotNetNuke.Entities.Modules;
 
 namespace DotNetNuke.Modules.TokenPlayer
 {
-	public class PlayerInfo
+	public class PlayerInfo : ModuleSettingsBase
 	{
 		private int _ModuleId;
 		private int _TabModuleId;
@@ -40,8 +41,17 @@ namespace DotNetNuke.Modules.TokenPlayer
 
 		public String PrimaryDNS
 		{
-			get { return _PrimaryDNS; }
-			set { _PrimaryDNS = value; }
+			get 
+			{
+				if (Settings.Contains("PrimaryDNS"))
+					return Convert.ToString(Settings["PrimaryDNS"]);
+				return null;
+			}
+			set 
+			{
+				var mc = new ModuleController();
+				mc.UpdateTabModuleSetting(tabModuleId, "PrimaryDNS", value.ToString());
+			}
 		}
 
 		public String PublishingPoint
