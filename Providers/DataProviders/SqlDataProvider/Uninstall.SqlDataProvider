@@ -1,0 +1,35 @@
+﻿/****************************************************************/
+/* SQL Uninstaller                                              */
+/* Author: Katherine Williams                                   */
+/* Created: June 2011                                           */
+/*                                                              */
+/* This script automatically runs when the module is            */
+/* uninstalled.  To run it in Sever Management studio, replace  */
+/* all instances of {databaseOwner}{objectQualifier} (ie. with  */
+/* "dbo.")                                                      */
+/*                                                              */
+/* Naming convention: Uninstall.SqlDataProvider                 */
+/*                                                              */
+/****************************************************************/
+
+drop procedure {databaseOwner}{objectQualifier}GetSecurePlayer
+GO
+
+
+drop procedure {databaseOwner}{objectQualifier}AddSecurePlayer
+GO
+
+
+drop procedure {databaseOwner}{objectQualifier}UpdateSecurePlayer
+GO
+ 
+
+ALTER TABLE {databaseOwner}{objectQualifier}SecurePlayers
+	DROP CONSTRAINT FK_SecurePlayers_Modules
+GO
+
+
+DROP TABLE {databaseOwner}{objectQualifier}SecurePlayers
+GO
+
+

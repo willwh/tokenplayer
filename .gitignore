@@ -1,0 +1,7 @@
+bin/
+install/
+obj/
+*.suo
+*.dll
+*.pdb
+TokenPlayer.csproj.user

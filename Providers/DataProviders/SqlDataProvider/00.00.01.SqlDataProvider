@@ -1,0 +1,147 @@
+﻿/****************************************************************/
+/* SQL Installer                                                */
+/* Author: Katherine Williams                                   */
+/* Created: June 2011                                           */
+/*                                                              */
+/* This script automatically runs when the module is installed. */
+/* To run it in Sever Management studio, replace all instances  */
+/* of {databaseOwner}{objectQualifier} (ie. with "dbo.")        */
+/*                                                              */
+/* Naming convention: {version in .dnn file}.SqlDataProvider    */
+/*                                                              */
+/****************************************************************/
+
+if exists (select * from dbo.sysobjects where id = object_id(N'{databaseOwner}{objectQualifier}GetSecurePlayer') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure {databaseOwner}{objectQualifier}GetSecurePlayer
+GO
+
+
+if exists (select * from dbo.sysobjects where id = object_id(N'{databaseOwner}{objectQualifier}AddSecurePlayer') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure {databaseOwner}{objectQualifier}AddSecurePlayer
+GO
+
+
+if exists (select * from dbo.sysobjects where id = object_id(N'{databaseOwner}{objectQualifier}UpdateSecurePlayer') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure {databaseOwner}{objectQualifier}UpdateSecurePlayer
+GO
+
+
+if not exists (select * from dbo.sysobjects where id = object_id(N'{databaseOwner}{objectQualifier}SecurePlayers') and OBJECTPROPERTY(id, N'IsTable') = 1)
+CREATE TABLE {databaseOwner}{objectQualifier}SecurePlayers (
+	[PlayerID] [int] IDENTITY (1, 1) NOT NULL ,
+	[ModuleID] [int] NOT NULL ,
+	[TabModuleID] [int] NOT NULL ,
+	[PrimaryDNS] [nvarchar] (255) NOT NULL ,
+	[PublishingPoint] [nvarchar] (200) NOT NULL ,
+	[StreamName] [nvarchar] (228) NOT NULL,
+	[SecretCode] [nvarchar] (50) NOT NULL,
+	[FlowplayerKey] [nvarchar] (21) NULL
+) ON [PRIMARY]
+
+GO
+
+
+if not exists (select * from dbo.sysobjects where id = object_id(N'PK_SecurePlayers') and OBJECTPROPERTY(id, N'IsPrimaryKey') = 1)
+ALTER TABLE {databaseOwner}{objectQualifier}SecurePlayers ADD CONSTRAINT
+	PK_SecurePlayers PRIMARY KEY CLUSTERED 
+	(
+	PlayerID
+	) ON [PRIMARY]
+
+GO
+
+
+if not exists (select * from dbo.sysobjects where id = object_id(N'FK_SecurePlayers_Modules') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE {databaseOwner}{objectQualifier}SecurePlayers ADD CONSTRAINT
+	FK_SecurePlayers_Modules FOREIGN KEY
+	(
+	ModuleID
+	) REFERENCES {databaseOwner}{objectQualifier}Modules
+	(
+	ModuleID
+	) ON DELETE CASCADE
+	 NOT FOR REPLICATION
+
+GO
+
+
+create procedure {databaseOwner}{objectQualifier}GetSecurePlayer
+
+@ModuleID int
+
+as
+
+select PlayerID,
+       ModuleID,
+	   TabModuleID,
+       PrimaryDNS,
+       PublishingPoint,
+       StreamName,
+	   SecretCode,
+	   FlowplayerKey
+from   {databaseOwner}{objectQualifier}SecurePlayers
+where  ModuleID = @ModuleID
+
+GO
+
+
+create procedure {databaseOwner}{objectQualifier}AddSecurePlayer
+
+@ModuleID         int,
+@TabModuleID	  int,
+@PrimaryDNS       nvarchar(255),
+@PublishingPoint  nvarchar(200),
+@StreamName       nvarchar(228),
+@SecretCode       nvarchar(50),
+@FlowplayerKey    nvarchar(21)
+
+as
+
+insert into {databaseOwner}{objectQualifier}SecurePlayers ( 
+  ModuleID,
+  TabModuleID,
+  PrimaryDNS,
+  PublishingPoint,
+  StreamName,
+  SecretCode,
+  FlowplayerKey
+)
+values (
+  @ModuleID,
+  @TabModuleID,
+  @PrimaryDNS,
+  @PublishingPoint,
+  @StreamName,
+  @SecretCode,
+  @FlowplayerKey
+)
+
+select SCOPE_IDENTITY()
+
+GO
+
+
+create procedure {databaseOwner}{objectQualifier}UpdateSecurePlayer
+
+@ModuleID         int,
+@TabModuleID         int,
+@PrimaryDNS       nvarchar(255),
+@PublishingPoint  nvarchar(200),
+@StreamName       nvarchar(228),
+@SecretCode       nvarchar(50),
+@FlowplayerKey    nvarchar(21)
+
+as
+
+update {databaseOwner}{objectQualifier}SecurePlayers
+set    PrimaryDNS = @PrimaryDNS,
+       PublishingPoint = @PublishingPoint,
+       StreamName = @StreamName,
+	   SecretCode = @SecretCode,
+       FlowplayerKey = @FlowplayerKey
+where  ModuleID = @ModuleID
+and    TabModuleID = @TabModuleID
+
+GO
+
+
